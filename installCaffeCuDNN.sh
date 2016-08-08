@@ -30,12 +30,16 @@ cd caffe
 cp Makefile.config.example Makefile.config
 # Enable cuDNN usage
 sudo sed -i 's/# USE_CUDNN := 1/USE_CUDNN := 1/' Makefile.config
-# Dec. 7, 2015; This only appears in once place currently
-# This is a 32 bit OS LMDB_MAP_SIZE needs to be reduced from
-# 1099511627776 to 536870912
-git grep -lz 1099511627776 | xargs -0 sed -i 's/1099511627776/536870912/g'
-# Change the comment too
-git grep -lz "// 1TB" | xargs -0 sed -i 's:// 1TB:// 1/2TB:g'
+
+if [ "$(uname -m)" = "x86_64" ]; then
+	# Dec. 7, 2015; This only appears in once place currently
+	# This is a 32 bit OS LMDB_MAP_SIZE needs to be reduced from
+	# 1099511627776 to 536870912
+	git grep -lz 1099511627776 | xargs -0 sed -i 's/1099511627776/536870912/g'
+	# Change the comment too
+	git grep -lz "// 1TB" | xargs -0 sed -i 's:// 1TB:// 1/2TB:g'
+fi
+
 # Use only 3 cores on L4T 23.1 install ; 
 # 4 cores hangs system
 /bin/echo -e "\e[1;32mCompiling Caffe\e[0m"
